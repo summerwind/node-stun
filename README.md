@@ -1,16 +1,56 @@
-# stun
+# STUN
 
 Session Traversal Utilities for NAT (STUN) client for Node.js.  
 
 ## Installation
 
-``` bash
-$ npm install stun
-```
+    $ npm install stun
 
 ## Usage
 
-Comming soon...
+*var client = stun.connect(port, host)*
+
+Creates a UDP connection to STUN server.    
+Here is an example that connect to the Google STUN server.
+
+    var stun  = require('stun');
+    
+    // STUN Server by Google
+    var port = 19302;
+    var host = 'stun.l.google.com';
+    
+    // Connect to STUN Server
+    var client = stun.connect(port, host);
+    
+*client.request(cb)*
+
+Send a STUN request.    
+*cb* is a callback that is fired when the transmission of the STUN client is complete.
+
+*client.indicate(cb)*
+
+Send a STUN indication.    
+*cb* is a callback that is fired when the transmission of the STUN client is complete.
+
+*client.send(buffer, offset, length, port, host, cb)*
+
+Send a UDP message.    
+The function of this method is the same as the *send* method of *dgram.Socket*.
+
+*Event: 'response'*
+
+Emitted when the client received a success response from STUN server.    
+The argument *packet* will be a Object that is represent success response packet. 
+
+*Event: 'message'*
+
+Emitted when the client received a UDP message that is not a STUN packet.    
+Arguments is the same as the *message* event of *dgram* module.
+
+*Event: 'error'*
+
+Emitted when the client received a error response from STUN server.    
+The argument *packet* will be a Object that is represent error response packet. 
 
 ## License
 
