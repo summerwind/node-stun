@@ -1,38 +1,70 @@
 var dgram = require('dgram'),
     stun  = require('../lib');
 
+var peer = [];
+
 // STUN Server (by Google)
 var port = 19302;
 var host = 'stun.l.google.com';
 
-// Create STUN client
-var client = stun.connect(port, host);
+// Event Handler
+var onRequest = function(){
+    console.log('Sending STUN packet');
+};
 
-// STUN Response event handler
-client.on('response', function(packet){
+var onError = function(){
+    console.log('Error:', err);
+};
+
+// Create STUN Client
+var client1 = stun.connect(port, host);
+client1.on('error', onError);
+
+var client2 = stun.connect(port, host);
+client2.on('error', onError);
+
+// Client1: STUN Response event handler
+client1.on('response', function(packet){
+    console.log('Received STUN packet:', packet);
+    
+    // Save NAT Address
+    peer.push(packet.attrs[stun.attributes.MAPPED_ADDRESS]);
+
+    // Sending STUN Packet
+    client2.request(onRequest);
+});
+
+// Client2: STUN Response event handler
+client2.on('response', function(packet){
     console.log('Received STUN packet:', packet);
 
-    // Get UDP port of NAT router
-    var peer_addr = packet.attrs[stun.attributes.MAPPED_ADDRESS];
+    // Save NAT Address
+    peer.push(packet.attrs[stun.attributes.MAPPED_ADDRESS]);
 
-    // Sending UDP message to NAT router
-    var sender = dgram.createSocket('udp4');
-    var msg = new Buffer('Hello peer!');
-    sender.send(msg, 0, msg.length, peer_addr.port, peer_addr.address);
+    // Sending UDP message
+    var msg = new Buffer("Hello!");
+    for (var i=0; i<10; i++) {
+        client1.send(msg, 0, msg.length, peer[1].port, peer[1].address);
+        client2.send(msg, 0, msg.length, peer[0].port, peer[0].address);
+    }
+
+    // Client close after 2sec
+    setTimeout(function(){
+        client1.close();
+        client2.close();
+        console.log('done'); 
+    }, 2000);
 });
 
-// UDP Message event handler
-client.on('message', function(msg, rinfo){
+// Client1: UDP Message event handler
+client1.on('message', function(msg, rinfo){
     console.log('Received UDP message:', msg);
-    client.close();
 });
 
-// Error event handler
-client.on('error', function(err){
-    console.log('Error:', err);
+// Client2: UDP Message event handler
+client2.on('message', function(msg, rinfo){
+    console.log('Received UDP message:', msg);
 });
 
 // Sending STUN request
-client.request(function(){
-    console.log('Request: Sent');
-});
+client1.request(onRequest);
