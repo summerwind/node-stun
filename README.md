@@ -42,6 +42,11 @@ The function of this method is the same as the *send* method of *dgram.Socket*.
 Emitted when the client received a success response from STUN server.    
 The argument *packet* will be a Object that is represent success response packet. 
 
+#### *Event: 'error_response'*
+
+Emitted when the client received a error response from STUN server.    
+The argument *packet* will be a Object that is represent error response packet. 
+
 #### *Event: 'message'*
 
 Emitted when the client received a UDP message that is not a STUN packet.    
@@ -49,8 +54,7 @@ Arguments is the same as the *message* event of *dgram* module.
 
 #### *Event: 'error'*
 
-Emitted when the client received a error response from STUN server.    
-The argument *packet* will be a Object that is represent error response packet. 
+Emitted when an error occurs on UDP socket.
 
 ## License
 
