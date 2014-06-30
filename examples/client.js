@@ -25,10 +25,17 @@ client2.on('error', onError);
 
 // Client1: STUN Response event handler
 client1.on('response', function(packet){
-    console.log('Received STUN packet:', packet);
+    console.log('Client1 Received STUN packet:', packet);
     
     // Save NAT Address
-    peer.push(packet.attrs[stun.attributes.MAPPED_ADDRESS]);
+    if (Object.prototype.hasOwnProperty.call(packet.attrs,
+                                             stun.attribute.MAPPED_ADDRESS))
+        peer.push(packet.attrs[stun.attribute.MAPPED_ADDRESS]);
+    else if (Object.prototype.hasOwnProperty.call(packet.attrs,
+                                                  stun.attribute.XOR_MAPPED_ADDRESS))
+        peer.push(packet.attrs[stun.attribute.XOR_MAPPED_ADDRESS]);
+    else
+        throw new Error('Could not read address from STUN packet');
 
     // Sending STUN Packet
     client2.request(onRequest);
@@ -36,10 +43,17 @@ client1.on('response', function(packet){
 
 // Client2: STUN Response event handler
 client2.on('response', function(packet){
-    console.log('Received STUN packet:', packet);
+    console.log('Client2 Received STUN packet:', packet);
 
     // Save NAT Address
-    peer.push(packet.attrs[stun.attributes.MAPPED_ADDRESS]);
+    if (Object.prototype.hasOwnProperty.call(packet.attrs,
+                                             stun.attribute.MAPPED_ADDRESS))
+        peer.push(packet.attrs[stun.attribute.MAPPED_ADDRESS]);
+    else if (Object.prototype.hasOwnProperty.call(packet.attrs,
+                                                  stun.attribute.XOR_MAPPED_ADDRESS))
+        peer.push(packet.attrs[stun.attribute.XOR_MAPPED_ADDRESS]);
+    else
+        throw new Error('Could not read address from STUN packet');
 
     // Sending UDP message
     var msg = new Buffer("Hello!");
@@ -52,18 +66,18 @@ client2.on('response', function(packet){
     setTimeout(function(){
         client1.close();
         client2.close();
-        console.log('done'); 
+        console.log('done');
     }, 2000);
 });
 
 // Client1: UDP Message event handler
 client1.on('message', function(msg, rinfo){
-    console.log('Received UDP message:', msg);
+    console.log('Client1 Received UDP message:', msg);
 });
 
 // Client2: UDP Message event handler
 client2.on('message', function(msg, rinfo){
-    console.log('Received UDP message:', msg);
+    console.log('Client2 Received UDP message:', msg);
 });
 
 // Sending STUN request
