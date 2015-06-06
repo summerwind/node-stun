@@ -10,16 +10,16 @@ module.exports = {
 
         client.on('response', function(packet){
             client.close();
-
             var method = stun.method.RESPONSE_S;
-            var attr   = stun.attribute.MAPPED_ADDRESS;
-
+            var addr   = false
+                || packet.attrs[stun.attributes.MAPPED_ADDRESS] 
+                || packet.attrs[stun.attributes.XOR_MAPPED_ADDRESS]
+            ;
             test.equal(packet.class, 1);
             test.equal(packet.method, method);
-            test.equal(packet.attrs[attr].family, 4);
-            test.notEqual(packet.attrs[attr].port, null);
-            test.notEqual(packet.attrs[attr].address, null);
-            
+            test.equal(addr.family, 4);
+            test.notEqual(addr.port, null);
+            test.notEqual(addr.address, null);
             test.done();
         });
 
