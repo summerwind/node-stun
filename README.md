@@ -1,8 +1,8 @@
 # STUN
 
-**This package is not in active development. Please let us know if you are interested in development or contributing.**
+Session Traversal Utilities for NAT (STUN) client for Node.js.
 
-Session Traversal Utilities for NAT (STUN) client for Node.js.  
+**This package is not in active development. Please let us know if you are interested in development or contribution.**
 
 ## Installation
 
